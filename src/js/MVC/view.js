@@ -5,4 +5,4 @@ module.exports = class {
         return require(`../../tamplate/${tempName}.hbs`)(model);
     }
     
-}
+};

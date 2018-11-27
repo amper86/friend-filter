@@ -7,6 +7,7 @@ module.exports = class {
         this.view = new View();
 
         this.init();
+        this.addButtonHandler();
     }
 
     init() {
@@ -16,7 +17,31 @@ module.exports = class {
     async friends() {
         const html = this.view.render('item', await this.model.friends);
 
-        document.querySelector('#oneList').innerHTML = html;
+        document.querySelector('#leftList').innerHTML = html;
+        console.log(await this.model.friends);
     }
-    
+
+    addButtonHandler() {
+        //ToDo: сделать одну функцию или метод для перемещеня элемента
+        const leftList = document.getElementById('leftList');
+        const rightList = document.getElementById('rightList');
+
+        leftList.addEventListener('click', (e) => {
+            const listItem = e.target.closest('li');
+
+            console.log(e);
+
+            if(e.target.tagName === 'BUTTON') {
+                rightList.appendChild(listItem);
+            }
+        });
+
+        rightList.addEventListener('click', (e) => {
+            const listItem = e.target.closest('li');
+
+            if(e.target.tagName === 'BUTTON') {
+                leftList.appendChild(listItem);
+            }
+        })
+    }
 };
