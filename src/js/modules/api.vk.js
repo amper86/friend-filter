@@ -17,7 +17,7 @@ module.exports = class {
         return new Promise((resolve, reject) => {
             VK.Auth.getLoginStatus((response) => {
                 if (response.status === 'connected') {
-                    console.log(response.status);
+                    //console.log(response.status);
                     resolve();
                 } else {
                     reject(new Error('Не авторизован'));

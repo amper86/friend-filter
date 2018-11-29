@@ -7,32 +7,46 @@ module.exports = class {
         this.view = new View();
 
         this.init();
-        this.addButtonHandler();
+        this.moveButtonHandlers();
     }
 
     init() {
         this.friends();
+        this.user();
+    }
+
+    async user() {
+        const [userObject] = await this.model.user;
+        const userHtml = this.view.render('user', userObject);
+
+        document.querySelector('#user').innerHTML = userHtml;
+        //console.log(userObject);
     }
 
     async friends() {
         const html = this.view.render('item', await this.model.friends);
 
         document.querySelector('#leftList').innerHTML = html;
-        console.log(await this.model.friends);
+        //console.log(await this.model.friends);
     }
 
-    addButtonHandler() {
-        //ToDo: сделать одну функцию или метод для перемещеня элемента
+    moveToColl(element, toColl) {
+        if (element.closest('#leftList')) {
+            toColl.appendChild(element);
+        } else {
+            toColl.appendChild(element);
+        }
+    }
+
+    moveButtonHandlers() {
         const leftList = document.getElementById('leftList');
         const rightList = document.getElementById('rightList');
 
         leftList.addEventListener('click', (e) => {
             const listItem = e.target.closest('li');
 
-            console.log(e);
-
-            if(e.target.tagName === 'BUTTON') {
-                rightList.appendChild(listItem);
+            if (e.target.tagName === 'BUTTON') {
+                this.moveToColl(listItem, rightList);
             }
         });
 
@@ -40,7 +54,7 @@ module.exports = class {
             const listItem = e.target.closest('li');
 
             if(e.target.tagName === 'BUTTON') {
-                leftList.appendChild(listItem);
+                this.moveToColl(listItem, leftList);
             }
         })
     }
