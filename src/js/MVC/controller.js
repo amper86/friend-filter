@@ -8,6 +8,7 @@ module.exports = class {
 
         this.init();
         this.moveButtonHandlers();
+        this.makeDnD();
     }
 
     init() {
@@ -30,17 +31,10 @@ module.exports = class {
         //console.log(await this.model.friends);
     }
 
-    moveToColl(element, toColl) {
-        if (element.closest('#leftList')) {
-            toColl.appendChild(element);
-        } else {
-            toColl.appendChild(element);
-        }
-    }
-
     moveButtonHandlers() {
         const leftList = document.getElementById('leftList');
         const rightList = document.getElementById('rightList');
+        //ToDO: подумать как объединить разработчики как в DnD
 
         leftList.addEventListener('click', (e) => {
             const listItem = e.target.closest('li');
@@ -57,5 +51,54 @@ module.exports = class {
                 this.moveToColl(listItem, leftList);
             }
         })
+    }
+
+    moveToColl(element, toColl) {
+        if (element.closest('#leftList')) {
+            toColl.appendChild(element);
+        } else {
+            toColl.appendChild(element);
+        }
+    }
+
+    makeDnD() {
+        const leftList = document.getElementById('leftList');
+        const rightList = document.getElementById('rightList');
+        const collums = [leftList, rightList];
+        let currentDrag;
+        //todo: можно сделать перетаскивание, через setDragImage будет видна картинка при перетаскивании
+
+        collums.forEach(coll => {
+            coll.addEventListener('dragstart', (e) => {
+                e.dataTransfer.setData('text/html', 'dragstart');
+                currentDrag = {
+                    source: coll,
+                    node: e.target.closest('.friends__item')
+                };
+                //console.log(e.target.closest('.friends__item'));
+            });
+
+            coll.addEventListener('dragover', (e) => {
+                e.preventDefault();
+            });
+
+            coll.addEventListener('drop', (e) => {
+                if (currentDrag) {
+                    //e.preventDefault();
+                    e.stopPropagation();
+
+                    //console.log(currentDrag.source);
+                    //console.log(coll);
+
+                    if (currentDrag.source !== coll) {
+                        coll.appendChild(currentDrag.node);
+                    }
+
+                    currentDrag = null;
+                }
+            });
+            //todo: сделать фильтр
+        })
+
     }
 };
