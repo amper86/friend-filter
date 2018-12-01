@@ -9,6 +9,7 @@ module.exports = class {
         this.init();
         this.moveButtonHandlers();
         this.makeDnD();
+        this.filterFriend();
     }
 
     init() {
@@ -65,6 +66,7 @@ module.exports = class {
         const leftList = document.getElementById('leftList');
         const rightList = document.getElementById('rightList');
         const collums = [leftList, rightList];
+
         let currentDrag;
         //todo: можно сделать перетаскивание, через setDragImage будет видна картинка при перетаскивании
 
@@ -97,8 +99,57 @@ module.exports = class {
                     currentDrag = null;
                 }
             });
-            //todo: сделать фильтр
         })
+    }
 
+    filterFriend() {
+        //обрабатываем кнопки и вызываем метод обработки проверки друзей
+        const leftBtn = document.getElementById('buttonLeft');
+        const rightBtn = document.getElementById('buttonRight');
+        const btnArray = [leftBtn, rightBtn];
+
+        btnArray.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                let currentInput = e.target.closest('button').nextElementSibling;
+                let inputValue = currentInput.value.toLowerCase();
+
+                e.preventDefault();
+                if (e.target.closest('button').id === 'buttonLeft') {
+                    let friendName = document.querySelectorAll('#leftList .friend__name');
+
+                    this.checkFriends(friendName, inputValue)
+                } else {
+                    let friendName = document.querySelectorAll('#rightList .friend__name');
+
+                    this.checkFriends(friendName, inputValue)
+                }
+            })
+        });
+    }
+
+    checkFriends(friendName, inputValue) {
+        //проверяем каждую карточку друга на совпадении в методе isMatching, убираем или оставляем карточку
+
+        for (let friend of friendName) {
+            let name = friend.textContent.toLowerCase();
+            let arrName = name.split(' ');
+            let li = friend.closest('li');
+
+            if (this.isMatching(arrName, inputValue)) {
+                li.style.display = 'block';
+            } else {
+                li.style.display = 'none';
+            }
+        }
+    }
+
+    isMatching(arrName, inputValue) {
+        //если true то совпадает значение по имени или фамилии
+        let flag = false;
+
+        if (~arrName[0].indexOf(inputValue) || ~arrName[1].indexOf(inputValue)) {
+            flag = true;
+        }
+        return flag
     }
 };
