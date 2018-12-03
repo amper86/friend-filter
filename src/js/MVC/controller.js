@@ -10,6 +10,7 @@ module.exports = class {
         this.moveButtonHandlers();
         this.makeDnD();
         this.filterFriend();
+        this.saveBtnHandler();
     }
 
     init() {
@@ -17,19 +18,76 @@ module.exports = class {
         this.user();
     }
 
+    saveBtnHandler() {
+        const saveBtn = document.querySelector('#save');
+
+        saveBtn.addEventListener('click', (e) => {
+            let leftArr =[];
+            let rightArr =[];
+            const friendsId = document.querySelectorAll('.friend');
+            e.preventDefault();
+            for (let friend of friendsId) {
+                if (friend.closest('#leftList')) {
+                    leftArr.push(friend.dataset.id);
+                } else {
+                    rightArr.push(friend.dataset.id);
+                }
+            }
+            this.saveLocalStorage(leftArr, rightArr)
+        })
+    }
+
+    saveLocalStorage(leftArr, rightArr) {
+        let storage = localStorage;
+        let saveObj ={};
+
+        saveObj.left = leftArr;
+        saveObj.right = rightArr;
+        storage.data = JSON.stringify(saveObj);
+
+        //console.log(JSON.stringify(saveObj));
+        //console.log(storage.data);
+    }
+
     async user() {
         const [userObject] = await this.model.user;
         const userHtml = this.view.render('user', userObject);
 
         document.querySelector('#user').innerHTML = userHtml;
-        //console.log(userObject);
     }
 
     async friends() {
-        const html = this.view.render('item', await this.model.friends);
+        const storage = localStorage;
+        if (!storage.data) {
+            const html = this.view.render('item', await this.model.friends);
 
-        document.querySelector('#leftList').innerHTML = html;
-        //console.log(await this.model.friends);
+            document.querySelector('#leftList').innerHTML = html;
+        } else {
+            let vkData = await this.model.friends;
+            let storageData = JSON.parse(storage.data);
+            let objLeft = {count: 0, items: []};
+            let objRight = {count: 0, items: []};
+
+            vkData.items.forEach(obj => {
+                storageData.left.forEach(leftArr => {
+                    if (obj.id === Number(leftArr)) {
+                        objLeft.items.push(obj);
+                        objLeft.count = objLeft.items.length;
+                    }
+                });
+                storageData.right.forEach(rightArr => {
+                    if (obj.id === Number(rightArr)) {
+                        objRight.items.push(obj);
+                        objRight.count = objRight.items.length;
+                    }
+                });
+            });
+            let htmlLeft = this.view.render('item', objLeft);
+            let htmlRight = this.view.render('item', objRight);
+
+            document.querySelector('#leftList').innerHTML = htmlLeft;
+            document.querySelector('#rightList').innerHTML = htmlRight;
+        }
     }
 
     moveButtonHandlers() {
@@ -77,7 +135,6 @@ module.exports = class {
                     source: coll,
                     node: e.target.closest('.friends__item')
                 };
-                //console.log(e.target.closest('.friends__item'));
             });
 
             coll.addEventListener('dragover', (e) => {
@@ -86,12 +143,7 @@ module.exports = class {
 
             coll.addEventListener('drop', (e) => {
                 if (currentDrag) {
-                    //e.preventDefault();
-                    e.stopPropagation();
-
-                    //console.log(currentDrag.source);
-                    //console.log(coll);
-
+                    e.preventDefault();
                     if (currentDrag.source !== coll) {
                         coll.appendChild(currentDrag.node);
                     }
