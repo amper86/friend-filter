@@ -65,7 +65,7 @@ module.exports = class {
             let objLeft = {count: 0, items: []};
             let objRight = {count: 0, items: []};
 
-            foo: for (let i = 0, vkFriends = vkData.items; i < vkFriends.length; i++) {
+            forVk: for (let i = 0, vkFriends = vkData.items; i < vkFriends.length; i++) {
                 let vkId = vkFriends[i].id;
 
                 for (let x = 0, storageDataRight = storageData.right; x < storageDataRight.length; x++) {
@@ -74,7 +74,7 @@ module.exports = class {
                     if (vkId === Number(rightFriend)) {
                         objRight.items.push(vkFriends[i]);
                         objRight.count = objRight.items.length;
-                        continue foo;
+                        continue forVk;
                     }
                 }
                 objLeft.items.push(vkFriends[i]);
