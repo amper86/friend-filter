@@ -44,9 +44,6 @@ module.exports = class {
         saveObj.left = leftArr;
         saveObj.right = rightArr;
         storage.data = JSON.stringify(saveObj);
-
-        //console.log(JSON.stringify(saveObj));
-        //console.log(storage.data);
     }
 
     async user() {
@@ -68,20 +65,21 @@ module.exports = class {
             let objLeft = {count: 0, items: []};
             let objRight = {count: 0, items: []};
 
-            vkData.items.forEach(obj => {
-                storageData.left.forEach(leftArr => {
-                    if (obj.id === Number(leftArr)) {
-                        objLeft.items.push(obj);
-                        objLeft.count = objLeft.items.length;
-                    }
-                });
-                storageData.right.forEach(rightArr => {
-                    if (obj.id === Number(rightArr)) {
-                        objRight.items.push(obj);
+            foo: for (let i = 0, vkFriends = vkData.items; i < vkFriends.length; i++) {
+                let vkId = vkFriends[i].id;
+
+                for (let x = 0, storageDataRight = storageData.right; x < storageDataRight.length; x++) {
+                    let rightFriend = storageDataRight[x];
+
+                    if (vkId === Number(rightFriend)) {
+                        objRight.items.push(vkFriends[i]);
                         objRight.count = objRight.items.length;
+                        continue foo;
                     }
-                });
-            });
+                }
+                objLeft.items.push(vkFriends[i]);
+                objLeft.count = objLeft.items.length;
+            }
             let htmlLeft = this.view.render('item', objLeft);
             let htmlRight = this.view.render('item', objRight);
 
@@ -93,7 +91,6 @@ module.exports = class {
     moveButtonHandlers() {
         const leftList = document.getElementById('leftList');
         const rightList = document.getElementById('rightList');
-        //ToDO: подумать как объединить разработчики как в DnD
 
         leftList.addEventListener('click', (e) => {
             const listItem = e.target.closest('li');
